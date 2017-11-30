@@ -24,6 +24,18 @@ async function getResults(db, query, params = []) {
     return await wrap(db, async db => db.all(query, ...params));
 }
 
+async function getIndexed(db, column, query, params = []) {
+    const results = await getResults(db, query, params);
+
+    const map = {};
+
+    for (const row of results) {
+        map[row[column]] = row;
+    }
+
+    return map;
+}
+
 async function getMap(db, query, params = []) {
     const map = {};
     const results = await getResults(db, query, params);
@@ -70,6 +82,7 @@ module.exports = {
     getSingleResult,
     getSingleResultOrNull,
     getResults,
+    getIndexed,
     getMap,
     getFlattenedResults,
     execute

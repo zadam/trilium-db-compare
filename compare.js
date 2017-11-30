@@ -17,38 +17,56 @@ function printDiff(one, two) {
     });
 }
 
-function compareRows(rs1, rs2) {
-    const len = Math.max(rs1.length, rs2.length);
+function checkMissing(table, name, idsLeft, idsRight) {
+    const missing = idsLeft.filter(item => idsRight.indexOf(item) < 0);
 
-    for (let i = 0; i < len; i++) {
-        const r1 = JSON.stringify(rs1[i], null, 2);
-        const r2 = JSON.stringify(rs2[i], null, 2);
+    if (missing.length > 0) {
+        console.log("Missing IDs from " + name + " table " + table + ": ", missing);
+    }
+}
 
-        if (r1 !== r2) {
-            console.log("Row #" + i + " differs:");
-            console.log("First: ", r1);
-            console.log("Second: ", r2);
-            printDiff(r1, r2);
-            process.exit(1);
+function compareRows(table, rsLeft, rsRight) {
+    const leftIds = Object.keys(rsLeft);
+    const rightIds = Object.keys(rsRight);
+
+    checkMissing(table, "right", leftIds, rightIds);
+    checkMissing(table, "left", rightIds, leftIds);
+
+    const commonIds = leftIds.filter(item => rightIds.includes(item));
+
+    for (const id of commonIds) {
+        const left = JSON.stringify(rsLeft[id], null, 2);
+        const right = JSON.stringify(rsRight[id], null, 2);
+
+        if (left !== right) {
+            console.log("Table " + table + " row id=" + id + " differs:");
+            console.log("Left: ", left);
+            console.log("Right: ", right);
+            printDiff(left, right);
         }
     }
 }
 
 async function main() {
-    const db1Path = process.argv[2];
-    const db2Path = process.argv[3];
+    const dbLeftPath = process.argv[2];
+    const dbRightPath = process.argv[3];
 
-    const db1 = await sqlite.open(db1Path, { Promise });
-    const db2 = await sqlite.open(db2Path, { Promise });
+    const dbLeft = await sqlite.open(dbLeftPath, { Promise });
+    const dbRight = await sqlite.open(dbRightPath, { Promise });
 
-    async function compare(query) {
-        const rs1 = await sql.getResults(db1, query);
-        const rs2 = await sql.getResults(db2, query);
+    async function compare(table, column, query) {
+        const rsLeft = await sql.getIndexed(dbLeft, column, query);
+        const rsRight = await sql.getIndexed(dbRight, column, query);
 
-        compareRows(rs1, rs2);
+        compareRows(table, rsLeft, rsRight);
     }
 
-    await compare("SELECT note_id, note_title, note_text, date_modified, is_protected, is_deleted FROM notes ORDER BY note_id");
+    await compare("notes_tree", "note_tree_id", "SELECT note_tree_id, note_id, note_pid, note_pos, date_modified, is_deleted, prefix FROM notes_tree");
+    await compare("notes", "note_id", "SELECT note_id, note_title, note_text, date_modified, is_protected, is_deleted FROM notes");
+    await compare("notes_history", "note_history_id", "SELECT note_history_id, note_id, note_title, note_text, date_modified_from, date_modified_to, is_protected FROM notes_history");
+    await compare("recent_notes", "note_path", "SELECT note_path, date_accessed, is_deleted FROM recent_notes");
+    await compare("options", "opt_name", "SELECT opt_name, opt_value FROM options " +
+ "WHERE opt_name IN ('username', 'password_verification_hash', 'encrypted_data_key', 'protected_session_timeout', 'history_snapshot_time_interval')");
 }
 
 (async () => {
