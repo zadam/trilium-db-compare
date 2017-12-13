@@ -17,8 +17,8 @@ function printDiff(one, two) {
     });
 }
 
-function checkMissing(table, name, idsLeft, idsRight) {
-    const missing = idsLeft.filter(item => idsRight.indexOf(item) < 0);
+function checkMissing(table, name, ids1, ids2) {
+    const missing = ids1.filter(item => ids2.indexOf(item) < 0);
 
     if (missing.length > 0) {
         console.log("Missing IDs from " + name + " table " + table + ": ", missing);
