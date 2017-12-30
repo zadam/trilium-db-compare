@@ -61,12 +61,15 @@ async function main() {
         compareRows(table, rsLeft, rsRight, column);
     }
 
-    await compare("notes_tree", "note_tree_id", "SELECT note_tree_id, note_id, note_pid, note_pos, date_modified, is_deleted, prefix FROM notes_tree");
+    await compare("notes_tree", "note_tree_id", "SELECT note_tree_id, note_id, parent_note_id, note_position, date_modified, is_deleted, prefix FROM notes_tree");
     await compare("notes", "note_id", "SELECT note_id, note_title, note_text, date_modified, is_protected, is_deleted FROM notes");
     await compare("notes_history", "note_history_id", "SELECT note_history_id, note_id, note_title, note_text, date_modified_from, date_modified_to, is_protected FROM notes_history");
     await compare("recent_notes", "note_tree_id", "SELECT note_tree_id, note_path, date_accessed, is_deleted FROM recent_notes");
-    await compare("options", "opt_name", "SELECT opt_name, opt_value FROM options " +
- "WHERE opt_name IN ('username', 'password_verification_hash', 'encrypted_data_key', 'protected_session_timeout', 'history_snapshot_time_interval')");
+    await compare("options", "opt_name", `SELECT opt_name, opt_value FROM options WHERE opt_name IN ('username', 
+                                                                                                     'password_verification_hash', 
+                                                                                                     'encrypted_data_key', 
+                                                                                                     'protected_session_timeout', 
+                                                                                                     'history_snapshot_time_interval')`);
 }
 
 (async () => {
