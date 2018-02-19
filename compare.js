@@ -61,12 +61,13 @@ async function main() {
         compareRows(table, rsLeft, rsRight, column);
     }
 
-    await compare("notes_tree", "note_tree_id", "SELECT note_tree_id, note_id, parent_note_id, note_position, date_modified, is_deleted, prefix FROM notes_tree");
-    await compare("notes", "note_id", "SELECT note_id, note_title, note_text, date_modified, is_protected, is_deleted FROM notes");
-    await compare("notes_history", "note_history_id", "SELECT note_history_id, note_id, note_title, note_text, date_modified_from, date_modified_to, is_protected FROM notes_history");
-    await compare("recent_notes", "note_tree_id", "SELECT note_tree_id, note_path, date_accessed, is_deleted FROM recent_notes");
-    await compare("options", "opt_name", `SELECT opt_name, opt_value FROM options WHERE is_synced = 1`);
-    await compare("attributes", "attribute_id", "SELECT attribute_id, note_id, name, value, date_created, date_modified FROM attributes");
+    await compare("note_tree", "noteTreeId", "SELECT noteTreeId, noteId, parentNoteId, notePosition, dateModified, isDeleted, prefix FROM note_tree");
+    await compare("notes", "noteId", "SELECT noteId, title, content, dateModified, isProtected, isDeleted FROM notes");
+    await compare("note_history", "noteHistoryId", "SELECT noteRevisionId, noteId, title, content, dateModifiedFrom, dateModifiedTo, isProtected FROM note_revisions");
+    await compare("recent_notes", "noteTreeId", "SELECT noteTreeId, notePath, dateAccessed, isDeleted FROM recent_notes");
+    await compare("options", "name", `SELECT name, value FROM options WHERE isSynced = 1`);
+    await compare("attributes", "attributeId", "SELECT attributeId, noteId, name, value, dateCreated, dateModified FROM attributes");
+    await compare("api_tokens", "apiTokenId", "SELECT apiTokenId, token, dateCreated, isDeleted FROM api_tokens");
 }
 
 (async () => {
