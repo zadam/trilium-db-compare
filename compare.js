@@ -61,13 +61,15 @@ async function main() {
         compareRows(table, rsLeft, rsRight, column);
     }
 
-    await compare("note_tree", "noteTreeId", "SELECT noteTreeId, noteId, parentNoteId, notePosition, dateModified, isDeleted, prefix FROM note_tree");
-    await compare("notes", "noteId", "SELECT noteId, title, content, dateModified, isProtected, isDeleted FROM notes");
-    await compare("note_history", "noteHistoryId", "SELECT noteRevisionId, noteId, title, content, dateModifiedFrom, dateModifiedTo, isProtected FROM note_revisions");
-    await compare("recent_notes", "noteTreeId", "SELECT noteTreeId, notePath, dateAccessed, isDeleted FROM recent_notes");
-    await compare("options", "name", `SELECT name, value FROM options WHERE isSynced = 1`);
-    await compare("attributes", "attributeId", "SELECT attributeId, noteId, name, value, dateCreated, dateModified FROM attributes");
-    await compare("api_tokens", "apiTokenId", "SELECT apiTokenId, token, dateCreated, isDeleted FROM api_tokens");
+    await compare("branches", "branchId", "SELECT branchId, noteId, parentNoteId, notePosition, dateCreated, dateModified, isDeleted, prefix, hash FROM branches");
+    await compare("notes", "noteId", "SELECT noteId, title, content, dateModified, isProtected, isDeleted, hash FROM notes");
+    await compare("note_history", "noteHistoryId", "SELECT noteRevisionId, noteId, title, content, dateModifiedFrom, dateModifiedTo, isProtected, hash FROM note_revisions");
+    await compare("images", "imageId", "SELECT imageId, format, checksum, name, isDeleted, dateCreated, dateModified, hash FROM images");
+    await compare("note_images", "noteImageId", "SELECT noteImageId, noteId, imageId, isDeleted, dateCreated, dateModified, hash FROM note_images");
+    await compare("recent_notes", "branchId", "SELECT branchId, notePath, dateCreated, isDeleted, hash FROM recent_notes");
+    await compare("options", "name", `SELECT optionId, name, value, hash, dateCreated, dateModified FROM options WHERE isSynced = 1`);
+    await compare("labels", "labelId", "SELECT labelId, noteId, name, value, dateCreated, dateModified, hash FROM labels");
+    await compare("api_tokens", "apiTokenId", "SELECT apiTokenId, token, dateCreated, isDeleted, hash FROM api_tokens");
 }
 
 (async () => {
