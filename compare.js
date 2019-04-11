@@ -64,28 +64,31 @@ async function main() {
     }
 
     await compare("branches", "branchId",
-        "SELECT branchId, noteId, parentNoteId, notePosition, dateCreated, dateModified, isDeleted, prefix, hash FROM branches");
+        "SELECT branchId, noteId, parentNoteId, notePosition, utcDateCreated, utcDateModified, isDeleted, prefix, hash FROM branches");
 
     await compare("notes", "noteId",
-        "SELECT noteId, title, content, dateModified, isProtected, isDeleted, hash FROM notes");
+        "SELECT noteId, title, dateModified, utcDateModified, dateCreated, utcDateCreated, isProtected, isDeleted, hash FROM notes");
+
+    await compare("note_contents", "noteId",
+        "SELECT noteId, content, utcDateModified, hash FROM note_contents");
 
     await compare("note_history", "noteHistoryId",
-        "SELECT noteRevisionId, noteId, title, content, dateModifiedFrom, dateModifiedTo, isProtected, hash FROM note_revisions");
+        "SELECT noteRevisionId, noteId, title, content, dateModifiedFrom, dateModifiedTo, utcDateModifiedFrom, utcDateModifiedTo, isProtected, hash FROM note_revisions");
 
     await compare("links", "linkId",
-        "SELECT linkId, noteId, targetNoteId, type, isDeleted, dateCreated, dateModified, hash FROM links");
+        "SELECT linkId, noteId, targetNoteId, type, isDeleted, utcDateCreated, utcDateModified, hash FROM links");
 
     await compare("recent_notes", "branchId",
-        "SELECT branchId, notePath, dateCreated, isDeleted, hash FROM recent_notes");
+        "SELECT branchId, notePath, utcDateCreated, isDeleted, hash FROM recent_notes");
 
     await compare("options", "name",
-            `SELECT name, value, dateCreated, dateModified, hash FROM options WHERE isSynced = 1`);
+            `SELECT name, value, utcDateCreated, utcDateModified, hash FROM options WHERE isSynced = 1`);
 
     await compare("attributes", "attributeId",
-        "SELECT attributeId, noteId, type, name, value, dateCreated, dateModified, hash FROM attributes");
+        "SELECT attributeId, noteId, type, name, value, utcDateCreated, utcDateModified, hash FROM attributes");
 
     await compare("api_tokens", "apiTokenId",
-        "SELECT apiTokenId, token, dateCreated, isDeleted, hash FROM api_tokens");
+        "SELECT apiTokenId, token, utcDateCreated, isDeleted, hash FROM api_tokens");
 }
 
 (async () => {
