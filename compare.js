@@ -70,9 +70,9 @@ async function main() {
         "SELECT noteId, title, dateModified, utcDateModified, dateCreated, utcDateCreated, isProtected, isDeleted, hash FROM notes");
 
     await compare("note_contents", "noteId",
-        "SELECT noteId, content, utcDateModified, hash FROM note_contents");
+       "SELECT noteId, content, utcDateModified, hash FROM note_contents");
 
-    await compare("note_history", "noteHistoryId",
+    await compare("note_revisions", "noteRevisionId",
         "SELECT noteRevisionId, noteId, title, content, dateModifiedFrom, dateModifiedTo, utcDateModifiedFrom, utcDateModifiedTo, isProtected, hash FROM note_revisions");
 
     await compare("links", "linkId",
