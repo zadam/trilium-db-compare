@@ -73,13 +73,13 @@ async function main() {
        "SELECT noteId, content, utcDateModified, hash FROM note_contents");
 
     await compare("note_revisions", "noteRevisionId",
-        "SELECT noteRevisionId, noteId, title, content, dateModifiedFrom, dateModifiedTo, utcDateModifiedFrom, utcDateModifiedTo, isProtected, hash FROM note_revisions");
+        "SELECT noteRevisionId, noteId, title, utcDateModified, dateCreated, dateLastEdited, utcDateCreated, utcDateLastEdited, isProtected, hash FROM note_revisions");
 
-    await compare("links", "linkId",
-        "SELECT linkId, noteId, targetNoteId, type, isDeleted, utcDateCreated, utcDateModified, hash FROM links");
+    await compare("note_revision_contents", "noteRevisionId",
+        "SELECT noteRevisionId, content, utcDateModified FROM note_revision_contents");
 
     await compare("recent_notes", "branchId",
-        "SELECT branchId, notePath, utcDateCreated, isDeleted, hash FROM recent_notes");
+        "SELECT noteId, notePath, utcDateCreated, isDeleted, hash FROM recent_notes");
 
     await compare("options", "name",
             `SELECT name, value, utcDateCreated, utcDateModified, hash FROM options WHERE isSynced = 1`);
