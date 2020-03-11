@@ -25,6 +25,14 @@ function checkMissing(table, name, ids1, ids2) {
     }
 }
 
+function handleBuffer(obj) {
+    if (obj && Buffer.isBuffer(obj.content)) {
+        obj.content = obj.content.toString();
+    }
+
+    return obj;
+}
+
 function compareRows(table, rsLeft, rsRight, column) {
     const leftIds = Object.keys(rsLeft);
     const rightIds = Object.keys(rsRight);
@@ -37,8 +45,8 @@ function compareRows(table, rsLeft, rsRight, column) {
     const commonIds = leftIds.filter(item => rightIds.includes(item));
 
     for (const id of commonIds) {
-        const valueLeft = Buffer.isBuffer(rsLeft[id]) ? rsLeft[id].toString() : rsLeft[id];
-        const valueRight = Buffer.isBuffer(rsRight[id]) ? rsRight[id].toString() : rsRight[id];
+        const valueLeft = handleBuffer(rsLeft[id]);
+        const valueRight = handleBuffer(rsRight[id]);
 
         const left = JSON.stringify(valueLeft, null, 2);
         const right = JSON.stringify(valueRight, null, 2);
