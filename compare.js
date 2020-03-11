@@ -37,8 +37,11 @@ function compareRows(table, rsLeft, rsRight, column) {
     const commonIds = leftIds.filter(item => rightIds.includes(item));
 
     for (const id of commonIds) {
-        const left = JSON.stringify(rsLeft[id], null, 2);
-        const right = JSON.stringify(rsRight[id], null, 2);
+        const valueLeft = Buffer.isBuffer(rsLeft[id]) ? rsLeft[id].toString() : rsLeft[id];
+        const valueRight = Buffer.isBuffer(rsRight[id]) ? rsRight[id].toString() : rsRight[id];
+
+        const left = JSON.stringify(valueLeft, null, 2);
+        const right = JSON.stringify(valueRight, null, 2);
 
         if (left !== right) {
             console.log("Table " + table + " row with " + column + "=" + id + " differs:");
@@ -67,16 +70,16 @@ async function main() {
         "SELECT branchId, noteId, parentNoteId, notePosition, utcDateCreated, utcDateModified, isDeleted, prefix, hash FROM branches");
 
     await compare("notes", "noteId",
-        "SELECT noteId, title, dateModified, utcDateModified, dateCreated, utcDateCreated, isProtected, isDeleted, hash FROM notes");
+        "SELECT noteId, title, dateModified, utcDateModified, dateCreated, utcDateCreated, isProtected, isDeleted, hash FROM notes WHERE isDeleted = 0");
 
     await compare("note_contents", "noteId",
-       "SELECT noteId, content, utcDateModified, hash FROM note_contents");
+       "SELECT note_contents.noteId, note_contents.content, note_contents.utcDateModified, note_contents.hash FROM note_contents JOIN notes USING(noteId) WHERE isDeleted = 0");
 
     await compare("note_revisions", "noteRevisionId",
-        "SELECT noteRevisionId, noteId, title, utcDateModified, dateCreated, dateLastEdited, utcDateCreated, utcDateLastEdited, isProtected, hash FROM note_revisions");
+        "SELECT noteRevisionId, noteId, title, utcDateModified, dateCreated, dateLastEdited, utcDateCreated, utcDateLastEdited, isProtected, hash FROM note_revisions WHERE isErased = 0");
 
     await compare("note_revision_contents", "noteRevisionId",
-        "SELECT noteRevisionId, content, utcDateModified FROM note_revision_contents");
+        "SELECT note_revision_contents.noteRevisionId, note_revision_contents.content, note_revision_contents.utcDateModified FROM note_revision_contents JOIN note_revisions USING(noteRevisionId) WHERE isErased = 0");
 
     await compare("recent_notes", "branchId",
         "SELECT noteId, notePath, utcDateCreated, isDeleted, hash FROM recent_notes");
