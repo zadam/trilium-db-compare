@@ -89,7 +89,7 @@ async function main() {
     await compare("note_revision_contents", "noteRevisionId",
         "SELECT note_revision_contents.noteRevisionId, note_revision_contents.content, note_revision_contents.utcDateModified FROM note_revision_contents JOIN note_revisions USING(noteRevisionId) WHERE isErased = 0");
 
-    await compare("recent_notes", "branchId",
+    await compare("recent_notes", "noteId",
         "SELECT noteId, notePath, utcDateCreated, isDeleted, hash FROM recent_notes");
 
     await compare("options", "name",
