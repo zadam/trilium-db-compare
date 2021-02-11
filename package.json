@@ -3,8 +3,9 @@
   "description": "Trilium database compare tool",
   "version": "0.0.1",
   "dependencies": {
-    "colors": "1.4.0",
-    "diff": "4.0.1",
-    "sqlite": "3.0.3"
+    "colors": "^1.4.0",
+    "diff": "^5.0.0",
+    "sqlite": "^4.0.19",
+    "sqlite3": "^5.0.1"
   }
 }
