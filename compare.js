@@ -1,13 +1,13 @@
 "use strict";
 
 require('colors');
-const jsdiff = require('diff');
+const jsDiff = require('diff');
 const sqlite = require('sqlite');
 const sqlite3 = require('sqlite3');
 const sql = require('./sql');
 
 function printDiff(one, two) {
-    const diff = jsdiff.diffChars(one, two);
+    const diff = jsDiff.diffChars(one, two);
 
     diff.forEach(function(part){
         // green for additions, red for deletions
@@ -16,6 +16,8 @@ function printDiff(one, two) {
             part.removed ? 'red' : 'grey';
         process.stderr.write(part.value[color]);
     });
+
+    console.log("");
 }
 
 function checkMissing(table, name, ids1, ids2) {
@@ -38,6 +40,8 @@ function compareRows(table, rsLeft, rsRight, column) {
     const leftIds = Object.keys(rsLeft);
     const rightIds = Object.keys(rsRight);
 
+    console.log("");
+    console.log("--------------------------------------------------------");
     console.log(`${table} - ${leftIds.length}/${rightIds.length}`);
 
     checkMissing(table, "right", leftIds, rightIds);
@@ -76,25 +80,25 @@ async function main() {
     }
 
     await compare("branches", "branchId",
-        "SELECT branchId, noteId, parentNoteId, notePosition, utcDateCreated, utcDateModified, isDeleted, prefix FROM branches");
+        "SELECT branchId, noteId, parentNoteId, notePosition, utcDateCreated, isDeleted, prefix FROM branches");
 
     await compare("notes", "noteId",
-        "SELECT noteId, title, dateModified, utcDateModified, dateCreated, utcDateCreated, isProtected, isDeleted FROM notes WHERE isDeleted = 0");
+        "SELECT noteId, title, dateCreated, utcDateCreated, isProtected, isDeleted FROM notes WHERE isDeleted = 0");
 
     await compare("note_contents", "noteId",
-       "SELECT note_contents.noteId, note_contents.content, note_contents.utcDateModified FROM note_contents JOIN notes USING(noteId) WHERE isDeleted = 0");
+       "SELECT note_contents.noteId, note_contents.content FROM note_contents JOIN notes USING(noteId) WHERE isDeleted = 0");
 
     await compare("note_revisions", "noteRevisionId",
-        "SELECT noteRevisionId, noteId, title, utcDateModified, dateCreated, dateLastEdited, utcDateCreated, utcDateLastEdited, isProtected FROM note_revisions");
+        "SELECT noteRevisionId, noteId, title, dateCreated, dateLastEdited, utcDateCreated, utcDateLastEdited, isProtected FROM note_revisions");
 
     await compare("note_revision_contents", "noteRevisionId",
-        "SELECT note_revision_contents.noteRevisionId, note_revision_contents.content, note_revision_contents.utcDateModified FROM note_revision_contents JOIN note_revisions USING(noteRevisionId)");
+        "SELECT noteRevisionId, content FROM note_revision_contents");
 
     await compare("options", "name",
-            `SELECT name, value, utcDateCreated, utcDateModified FROM options WHERE isSynced = 1`);
+            `SELECT name, value, utcDateCreated FROM options WHERE isSynced = 1`);
 
     await compare("attributes", "attributeId",
-        "SELECT attributeId, noteId, type, name, value, utcDateModified FROM attributes");
+        "SELECT attributeId, noteId, type, name, value FROM attributes");
 
     await compare("api_tokens", "apiTokenId",
         "SELECT apiTokenId, token, utcDateCreated, isDeleted FROM api_tokens");
